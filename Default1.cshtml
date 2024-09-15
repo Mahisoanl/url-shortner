@@ -1,0 +1,44 @@
+﻿@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.Title = "Home Page";
+}
+
+@{
+    string URL = "";
+    string longUrl = "";
+    bool post = false;
+    if(IsPost) {
+        longUrl = Request.Form["url"];
+        // Change the UI of the web page.
+        post = true;
+        // Open the connection
+        //var db = Database.Open("StarterSite");
+        var db = Database.OpenConnectionString("Data Source=|DataDirectory|\\StarterSite.sdf", "System.Data.SqlServerCe.4.0");
+        // Get the URL
+        URL = RandomURL.GetURL();
+        if(db.Query("SELECT * FROM RandomUrls WHERE ShortUrl = @0", URL).Count() > 0) {
+            // Generate a new URL because the previous one had a match.
+            URL = RandomURL.GetURL();
+        }
+
+        // Now the URL is unique, so save it...
+        db.Execute("INSERT INTO RandomUrls (UrlString, ShortUrl) VALUES (@0, @1)", longUrl, URL);
+    }
+}
+
+@if(post) {
+    <p>The URL generated was as: <span style="color: #999;">https://slgl.in/</span>@URL</p>
+    <p>To shorten any other URL, use the following form.</p>
+} else {
+    <p>Enter the URL and press Submit, it will save the current long URL and will present you with a short URL that can be used. </p>
+}
+<form method="post">
+    <input type="text" name="url" />
+    <input type="submit" value="Submit" />
+</form>
+
+<ul>
+    @foreach (var row in Database.OpenConnectionString("Data Source=|DataDirectory|\\StarterSite.sdf", "System.Data.SqlServerCe.4.0").Query("SELECT * FROM RandomUrls")) {
+        <li><a href="~/redirect/@row.ShortUrl">https://slgl.in/@row.ShortUrl</a></li>
+    }
+</ul>

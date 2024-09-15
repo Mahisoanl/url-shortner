@@ -1,0 +1,13 @@
+﻿@{
+    // Get the short url
+    var shortUrl = UrlData[0];
+
+    // find it in the database
+    var db = Database.Open("StarterSite");
+    var found = db.Query("SELECT * FROM RandomUrls WHERE ShortUrl = @0", shortUrl).Count() > 0;
+    if(found) {
+        Response.Redirect(db.Query("SELECT * FROM RandomUrls WHERE ShortUrl = @0", shortUrl).First().UrlString);
+    } else {
+        Response.Redirect("~/");
+    }
+}

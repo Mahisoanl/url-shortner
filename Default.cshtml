@@ -1,0 +1,19 @@
+﻿@{
+    // Get the short url
+    var shortUrl = UrlData[0];
+
+    // find it in the database
+    var db = Database.OpenConnectionString("Data Source=|DataDirectory|\\StarterSite.sdf", "System.Data.SqlServerCe.4.0");
+    var found = db.Query("SELECT * FROM RandomUrls WHERE ShortUrl = @0", shortUrl).Count() > 0;
+   
+    if (found)
+    {
+        shortUrl = "2FuutOWb852";
+        string surl = db.Query("SELECT * FROM RandomUrls WHERE ShortUrl = @0", shortUrl).First().UrlString;
+        Response.Redirect(surl);
+    }
+    else
+    {
+        Response.Redirect("~/");
+    }
+}
